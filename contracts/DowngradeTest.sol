@@ -3,95 +3,117 @@ pragma solidity ^0.8.8;
 pragma experimental ABIEncoderV2;
 
 contract DowngradeTestParent {
-  event Inherited();
+    event Inherited();
 }
 
 contract DowngradeTest is DowngradeTestParent {
+    //structs; enums; contracts; address payable; functions
 
-  //structs; enums; contracts; address payable; functions
+    type MyInt is int16;
 
-  type MyInt is int16;
+    struct Pair {
+        uint256 x;
+        MyInt y;
+    }
 
-  struct Pair {
-    uint x;
-    MyInt y;
-  }
+    struct AsymmetricTriple {
+        Pair p;
+        uint256 z;
+    }
 
-  struct AsymmetricTriple {
-    Pair p;
-    uint z;
-  }
+    enum Ternary {
+        Yes,
+        No,
+        MaybeSo
+    }
 
-  enum Ternary {
-    Yes, No, MaybeSo
-  }
+    enum PositionOnHill {
+        Up,
+        Down,
+        HalfwayUp
+    }
 
-  enum PositionOnHill {
-    Up, Down, HalfwayUp
-  }
+    fallback() external {}
 
-  fallback() external {
-  }
+    function() external doYouSeeMe = this.causeTrouble;
 
-  function() external doYouSeeMe = this.causeTrouble;
+    function() internal canYouReadMe = causeTrouble;
 
-  function() internal canYouReadMe = causeTrouble;
+    function run(
+        AsymmetricTriple memory at,
+        Ternary t,
+        DowngradeTest dt,
+        address payable ap
+    ) public {
+        emit TheWorks(at, t, dt, ap);
+    }
 
-  function run(AsymmetricTriple memory at, Ternary t, DowngradeTest dt, address payable ap) public {
-    emit TheWorks(at, t, dt, ap);
-  }
+    event TheWorks(AsymmetricTriple, Ternary, DowngradeTest, address payable);
 
-  event TheWorks(AsymmetricTriple, Ternary, DowngradeTest, address payable);
-  
-  function causeTrouble() public {
-    emit CauseTrouble(this.causeTrouble);
-  }
+    function causeTrouble() public {
+        emit CauseTrouble(this.causeTrouble);
+    }
 
-  event CauseTrouble(function() external);
+    event CauseTrouble(function() external);
 
-  function shhImADecimal(int168 secretlyADecimal) public returns (int168) {
-    emit Done();
-    return secretlyADecimal;
-  }
+    function shhImADecimal(int168 secretlyADecimal) public returns (int168) {
+        emit Done();
+        return secretlyADecimal;
+    }
 
-  event Done();
+    event Done();
 
-  function enumSilliness(uint8 decoy1, uint8 decoy2, Ternary x, PositionOnHill y) public {
-    emit EnumSilliness1(decoy1, decoy2, x, y);
-    emit EnumSilliness2(decoy1, decoy2, x, y);
-  }
+    function enumSilliness(
+        uint8 decoy1,
+        uint8 decoy2,
+        Ternary x,
+        PositionOnHill y
+    ) public {
+        emit EnumSilliness1(decoy1, decoy2, x, y);
+        emit EnumSilliness2(decoy1, decoy2, x, y);
+    }
 
-  event EnumSilliness1(uint8 indexed, uint8 indexed, Ternary, PositionOnHill);
-  event EnumSilliness2(uint8, uint8, Ternary indexed, PositionOnHill indexed);
+    event EnumSilliness1(uint8 indexed, uint8 indexed, Ternary, PositionOnHill);
+    event EnumSilliness2(uint8, uint8, Ternary indexed, PositionOnHill indexed);
 
-  function decoy() public { //here to make the additionalContexts test harder
-    DecoyLibrary.decoy();
-    emit Done();
-  }
+    function decoy() public {
+        //here to make the additionalContexts test harder
+        DecoyLibrary.decoy();
+        emit Done();
+    }
 
-  function emitParent() public {
-    emit Inherited();
-  }
+    function emitParent() public {
+        emit Inherited();
+    }
 
-  function returnsStuff() public pure returns (Pair memory, Ternary) {
-    return (Pair(107, MyInt.wrap(683)), Ternary.No);
-  }
+    function returnsStuff() public pure returns (Pair memory, Ternary) {
+        return (Pair(107, MyInt.wrap(683)), Ternary.No);
+    }
 
-  error CustomError(Pair pair);
+    error CustomError(Pair pair);
 
-  function throwCustom() public pure {
-    revert CustomError(Pair(1, MyInt.wrap(2)));
-  }
+    function throwCustom() public pure {
+        revert CustomError(Pair(1, MyInt.wrap(2)));
+    }
 
-  function simple(uint) public {
-    emit Done();
-  }
+    function simple(uint256) public {
+        emit Done();
+    }
 }
 
 library DecoyLibrary {
-  event EnumSilliness1(uint8, uint8, DowngradeTest.Ternary indexed, DowngradeTest.PositionOnHill indexed);
-  event EnumSilliness2(uint8 indexed, uint8 indexed, DowngradeTest.Ternary, DowngradeTest.PositionOnHill);
+    event EnumSilliness1(
+        uint8,
+        uint8,
+        DowngradeTest.Ternary indexed,
+        DowngradeTest.PositionOnHill indexed
+    );
+    event EnumSilliness2(
+        uint8 indexed,
+        uint8 indexed,
+        DowngradeTest.Ternary,
+        DowngradeTest.PositionOnHill
+    );
 
-  function decoy() external pure {
-  }
+    function decoy() external pure {}
 }
