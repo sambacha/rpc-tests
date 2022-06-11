@@ -1,0 +1,1 @@
+cat success.json | jq .result
